@@ -6,8 +6,23 @@ package com.as_supportpe.calculadora;
 
 import org.boris.expr.*;
 import org.boris.expr.parser.ExprParser;
+import org.boris.expr.util.Exprs;
+import org.boris.expr.util.SimpleEvaluationContext;
+
+import java.io.IOException;
 
 public class Calculator {
+
+    public static String eval(String expresion) throws IOException, ExprException {
+        SimpleEvaluationContext context = new SimpleEvaluationContext();
+        Expr e = ExprParser.parse(expresion);
+        Exprs.toUpperCase(e);
+        if (e instanceof ExprEvaluatable) {
+            e = ((ExprEvaluatable) e).evaluate(context);
+        }
+        return e.toString();
+    }
+
 /*
 SimpleEvaluationContext context = new SimpleEvaluationContext();
         System.out.println("Expr Evaluator v1.0");

@@ -7,6 +7,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.boris.expr.ExprException;
+
+import java.io.IOException;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -87,10 +90,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnEqual:
                 if (parenthesisCounter == 0){
-
+                    if (!"+-*/(".contains(Character.toString(lastCharTxt))){
+                        try {
+                            txtResult.setText(Calculator.eval(currTxt));
+                        } catch (IOException e) {
+                            msj = e.toString();
+                        } catch (ExprException e) {
+                            msj = e.toString();
+                        }
+                    }
+                    else{
+                        msj = Character.toString(lastCharTxt);
+                        msj = "Expresión incompleta: No debe terminar en '{simb}'".replace("{simb}",msj);
+                    }
                 }
                 else{
-                    msj = "Debe cerrar {num} paréntesis".replace("{num}", Integer.toString(parenthesisCounter));
+                    msj = Integer.toString(parenthesisCounter);
+                    msj = "Debe cerrar {num} paréntesis".replace("{num}", msj);
                 }
                 break;
             case R.id.btnPoint:
