@@ -5,13 +5,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private TextView txtExpresion;
+    private TextView txtResult;
+    private int parenthesisCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        txtExpresion = (TextView) findViewById(R.id.txtExpresion);
+        txtResult = (TextView) findViewById(R.id.txtResult);
         String btns = "C,Open,Close,Back,Div,Multi,Minus,Plus,Equal,Point";
         for (int i = 0; i < 10; i++) { btns = btns + ",Num" + i; }
         for(String btn:btns.split(",")){
@@ -22,46 +31,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        TextView txtExpresion = (TextView) findViewById(R.id.txtExpresion);
-        TextView txtResult = (TextView) findViewById(R.id.txtResult);
         String btnTxt = ((Button)v).getText().toString();
+        String currTxt = txtExpresion.getText().toString();
+        boolean currTxtIsNotEmpty = currTxt.length() != 0;
+        char lastCharTxt = currTxtIsNotEmpty ? currTxt.charAt(currTxt.length() - 1) : '?';
+        String msj = "";
 
         switch (v.getId()){
             case R.id.btnC:
                 txtExpresion.setText("");
-                txtResult.setText("0");
+                txtResult.setText("");
+                parenthesisCounter = 0;
                 break;
             case R.id.btnBack:
-                CharSequence txt = txtExpresion.getText();
-                txt = txt.subSequence(0,txt.length()-1);
-                txtExpresion.setText(txt);
+                if (currTxtIsNotEmpty) {
+                    if (currTxt.endsWith("(")){parenthesisCounter--;}
+                    if (currTxt.endsWith(")")){parenthesisCounter++;}
+                    currTxt = currTxt.substring(0, currTxt.length() - 1);
+                    txtExpresion.setText(currTxt);
+                }
                 break;
             case R.id.btnOpen:
-                txtExpresion.append(btnTxt);
+                if("+-*/(?".contains(Character.toString(lastCharTxt))){
+                    txtExpresion.append(btnTxt);
+                    parenthesisCounter++;
+                }
                 break;
             case R.id.btnClose:
-                txtExpresion.append(btnTxt);
+                if (parenthesisCounter > 0){
+                    if (Character.isDigit(lastCharTxt)) {
+                        txtExpresion.append(btnTxt);
+                        parenthesisCounter--;
+                    }
+                }
                 break;
             case R.id.btnDiv:
-                txtExpresion.append(btnTxt);
+                if (Character.isDigit(lastCharTxt) || lastCharTxt == ')') {
+                    txtExpresion.append(btnTxt);
+                }                                                
                 break;
             case R.id.btnMulti:
-                txtExpresion.append(btnTxt);
+                if (Character.isDigit(lastCharTxt) || lastCharTxt == ')') {
+                    txtExpresion.append(btnTxt);
+                }
                 break;
             case R.id.btnMinus:
-                txtExpresion.append(btnTxt);
+                if(lastCharTxt != '-'){
+                    txtExpresion.append(btnTxt);    
+                }
                 break;
             case R.id.btnPlus:
-                txtExpresion.append(btnTxt);
+                if (Character.isDigit(lastCharTxt) || lastCharTxt == ')') {
+                    txtExpresion.append(btnTxt);
+                }
                 break;
             case R.id.btnEqual:
+                if (parenthesisCounter == 0){
 
+                }
+                else{
+                    msj = "Debe cerrar {num} paréntesis".replace("{num}", Integer.toString(parenthesisCounter));
+                }
                 break;
             case R.id.btnPoint:
-                txtExpresion.append(btnTxt);
+                if (Character.isDigit(lastCharTxt)) {
+                    if (!currTxt.replaceAll("[0-9]", "").endsWith(".")){
+                        txtExpresion.append(btnTxt);
+                    }
+                }                
                 break;
             default:
-                txtExpresion.append(btnTxt);
+                if(!currTxt.endsWith(")")){
+                    txtExpresion.append(btnTxt);
+                }
+        }
+        if (msj.length() > 0) {
+            Toast.makeText(this,msj,Toast.LENGTH_SHORT).show();
         }
     }
 }

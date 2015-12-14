@@ -13,11 +13,11 @@
     <TextView
         android:id="@+id/txtExpresion"
         style="@style/txtView"
-        android:text="0" />
+        android:text="" />
     <TextView
         android:id="@+id/txtResult"
         style="@style/txtView"
-        android:text="0" />
+        android:text="" />
     <LinearLayout style="@style/btnRow">
         <Button
             android:id="@+id/btnC"
